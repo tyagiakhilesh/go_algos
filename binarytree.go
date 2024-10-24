@@ -172,6 +172,11 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 				}
 			}
 
+			// Cleanup so that it can be reclaimed by memory management system
+			maxInLeftSubtree.Parent = nil
+			maxInLeftSubtree.Left = nil
+			maxInLeftSubtree.Right = nil
+
 			return node, nil
 		}
 	}
