@@ -67,7 +67,7 @@ func TestLargeNumberOfElementsInTree(t *testing.T) {
 
 	for count < elementsCount {
 		count++
-		bst.Insert(bst, Int{Val: int64(rand.Intn(1000000))})
+		bst.Insert(bst, Int{Val: int64(rand.Intn(1000001))})
 	}
 	printMaxMin(bst)
 	searchForRandomValues(count, bst)
@@ -88,6 +88,7 @@ func searchForRandomValues(count int64, bst *Bst[Int]) {
 	var lastKnownSize int64 = 0
 	var sc int64 = 100
 	count = 0
+	fmt.Printf("Height of tree at begining of random search and deletion is %v\n", bst.Height(bst))
 	for count < sc {
 		count++
 		e := int64(rand.Intn(1000000))
@@ -104,4 +105,5 @@ func searchForRandomValues(count int64, bst *Bst[Int]) {
 			fmt.Printf("Element %v not found in tree\n", e)
 		}
 	}
+	fmt.Printf("Height of tree at end of random search and deletion is %v\n", bst.Height(bst))
 }

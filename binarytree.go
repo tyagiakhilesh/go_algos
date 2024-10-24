@@ -3,6 +3,7 @@ package algos
 import (
 	"errors"
 	"fmt"
+	"math"
 )
 
 type DataType interface {
@@ -181,4 +182,12 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 		}
 	}
 	return nil, errors.New(`No node found to delete`)
+}
+
+func (ty Bst[T]) Height(tree *Bst[T]) float64 {
+	if nil != tree {
+		return 1 + math.Max(ty.Height(tree.Left), ty.Height(tree.Right))
+	} else {
+		return 0
+	}
 }
