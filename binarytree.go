@@ -1,6 +1,9 @@
 package algos
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type DataType interface {
 	Equals(other DataType) bool
@@ -105,6 +108,7 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 
 		// Deleting leaf node
 		if node.Left == nil && node.Right == nil {
+			fmt.Printf("Deleting leaf node\n")
 			if nodeIsLeftChildOfItsParent {
 				node.Parent.Left = nil
 			} else {
@@ -115,6 +119,7 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 		}
 		// Deleting a node which has only left child tree
 		if node.Left != nil && node.Right == nil {
+			fmt.Printf("Deleting a node which has only left child tree\n")
 			// This node is left child of its parent
 			if nodeIsLeftChildOfItsParent {
 				node.Parent.Left = node.Left
@@ -130,6 +135,7 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 
 		//Deleting a node which has only right child tree
 		if node.Left == nil && node.Right != nil {
+			fmt.Printf("Deleting a node which has only right child tree\n")
 			if nodeIsLeftChildOfItsParent {
 				node.Parent.Left = node.Right
 				node.Right.Parent = node.Parent
@@ -144,24 +150,28 @@ func (ty Bst[T]) Delete(tree *Bst[T], data T) (*Bst[T], error) {
 
 		//Deleting a node which has both children
 		if node.Left != nil && node.Right != nil {
-			// Let's make left child as root of new subtree
-			var n = node.Left
-			if nodeIsLeftChildOfItsParent {
-				node.Parent.Left = n
-			} else {
-				node.Parent.Right = n
+			fmt.Printf("Deleting a node with both children\n")
+			maxInLeftSubtree, _ := ty.Max(node.Left)
+
+			// Move left subtree of maxInLeftSubtree to the right of maxInLeftSubtree's parent
+			if node != maxInLeftSubtree.Parent {
+				maxInLeftSubtree.Parent.Right = maxInLeftSubtree.Left
+				if maxInLeftSubtree.Left != nil {
+					maxInLeftSubtree.Left.Parent = maxInLeftSubtree.Parent
+				}
 			}
-			n.Parent = node.Parent
-			if n.Right != nil {
-				// take right children of lN and insert it at min position in right subtree of node
-				leftMostNodeInRightChildrenOfNode, _ := ty.Min(node.Right)
-				leftMostNodeInRightChildrenOfNode.Left = n.Right
-				n.Right.Parent = leftMostNodeInRightChildrenOfNode
-				n.Right = nil
+
+			// Copy the value of maxInLeftSubtree to the node
+			node.Data = maxInLeftSubtree.Data
+
+			// If maxInLeftSubtree is a direct child of the node, make sure to update node.Left correctly
+			if node == maxInLeftSubtree.Parent {
+				node.Left = maxInLeftSubtree.Left
+				if maxInLeftSubtree.Left != nil {
+					maxInLeftSubtree.Left.Parent = node
+				}
 			}
-			node.Parent = nil
-			node.Left = nil
-			node.Right = nil
+
 			return node, nil
 		}
 	}

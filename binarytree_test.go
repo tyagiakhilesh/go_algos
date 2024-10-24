@@ -69,21 +69,23 @@ func TestLargeNumberOfElementsInTree(t *testing.T) {
 		count++
 		bst.Insert(bst, Int{Val: int64(rand.Intn(1000000))})
 	}
-	printElementCountInTree(bst)
 	printMaxMin(bst)
 	searchForRandomValues(count, bst)
 
 }
 
-func printElementCountInTree(bst *Bst[Int]) {
+func printElementCountInTree(bst *Bst[Int]) int64 {
 	var eleCount int64 = 0
 	bst.Traversal(bst, func(d DataType) {
 		eleCount++
 	})
 	fmt.Printf("%v Elements are there in tree\n", eleCount)
+	return eleCount
 }
 
 func searchForRandomValues(count int64, bst *Bst[Int]) {
+	var latestSize int64 = 0
+	var lastKnownSize int64 = 0
 	var sc int64 = 100
 	count = 0
 	for count < sc {
@@ -91,9 +93,13 @@ func searchForRandomValues(count int64, bst *Bst[Int]) {
 		e := int64(rand.Intn(1000000))
 		s := bst.Search(bst, Int{Val: e})
 		if nil != s {
+			lastKnownSize = latestSize
 			fmt.Printf("Found element %v in tree\n", s.Data.Val)
 			bst.Delete(bst, Int{Val: e})
-			printElementCountInTree(bst)
+			latestSize = printElementCountInTree(bst)
+			if lastKnownSize-latestSize > 1 {
+				fmt.Printf("#### Here is the bug\n")
+			}
 		} else {
 			fmt.Printf("Element %v not found in tree\n", e)
 		}
